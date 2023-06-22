@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "JustStickyCursor (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "JustStickyCursor (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}
