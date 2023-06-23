@@ -1,4 +1,29 @@
-﻿*Recommended Markdown Viewer: [Markdown Editor](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.MarkdownEditor2)*
+﻿
+## TODO, in order:
+* Give app a tray icon for persistence
+	* Show (default) and Close context menu
+	* Notification when closing the window
+* The actual sticky cursor behavior
+	* Where does this code go?
+	* Update rate?
+	* **Built with configurability in mind**
+		* Move distance
+		* Monitor edges to work on
+	* If cursor is at edge: Lock its y position until it's moved towards it x pixels (track in var)
+	* Detect monitor configuration, edge locations
+	* Allow free movement if [key] is held - including mouse keys
+* Settings UI
+	* Run on startup?
+	* Sticky or normal when program starts?
+	* Keybinds:
+		* KeyDown event when textbox is selected; get and fill box with key name (modifiers?)
+		* https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.uielement.keydown?view=winrt-22621
+		* Enable sticky (Ctrl+Win+PgUp) - plays splort or system "Speech On"
+		* Disable sticky (Ctrl+Win+PgDn) - plays trolps or system "Speech Off"
+		* Hold on keyboard to ignore sticky (Alt or disabled)
+		* Hold on mouse to ignore sticky (LMB)
+	* Stick resistance value; slider and NumberBox with SpinButton
+	* Sounds off/system/slimy (splort)
 
 ## Getting Started
 
