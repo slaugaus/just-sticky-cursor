@@ -45,7 +45,7 @@
                 -->
                 <NavigationViewItem x:Uid="Shell_About" helpers:NavigationHelper.NavigateTo="JustStickyCursor.ViewModels.AboutViewModel">
                     <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe7c3;"/>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe946;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
