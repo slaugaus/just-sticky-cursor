@@ -15,6 +15,8 @@
                 Margin="{StaticResource XSmallTopMargin}"
                 Style="{ThemeResource BodyTextBlockStyle}" />
             <HyperlinkButton x:Uid="SettingsPage_PrivacyTermsLink" Margin="{StaticResource SettingsPageHyperlinkButtonMargin}" />
+            <Button x:Uid="splort" Content="splort" Click="{x:Bind ViewModel.Splort}"/>
+            <Button x:Uid="trolps" Content="trolps" Click="{x:Bind ViewModel.SplortButBackwards}"/>
         </StackPanel>
     </Grid>
 </Page>
