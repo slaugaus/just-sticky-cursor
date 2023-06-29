@@ -5,6 +5,7 @@
 	* Notification when closing the window
 * The actual sticky cursor behavior
 	* Where does this code go?
+    	* As a service???
 	* Update rate?
 	* **Built with configurability in mind**
 		* Move distance
