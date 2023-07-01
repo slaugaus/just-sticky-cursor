@@ -147,6 +147,7 @@
   <data name="Settings_AboutDescription.Text" xml:space="preserve">
     <value>by Austin Slaughter (slaugaus)
 Small app that implements "sticky cursor" functionality between monitors.
+(Because I haven't set up anything in the notification tray, you'll have to leave this window open for it to work...)
 
 ... For some reason, the template for this UI included a privacy policy link.</value>
   </data>
@@ -160,8 +161,8 @@ Small app that implements "sticky cursor" functionality between monitors.
     <value>&lt;toast launch="action=ToastClick"&gt;
   &lt;visual&gt;
     &lt;binding template="ToastGeneric"&gt;
-      &lt;text&gt;App Notification&lt;/text&gt;
-      &lt;text&gt;&lt;/text&gt;
+      &lt;text&gt;Test Notification&lt;/text&gt;
+      &lt;text&gt;TODO: this is likely unnecessary&lt;/text&gt;
       &lt;image placement="appLogoOverride" hint-crop="circle" src="{0}Assets/WindowIcon.ico"/&gt;
     &lt;/binding&gt;
   &lt;/visual&gt;

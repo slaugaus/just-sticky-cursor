@@ -22,7 +22,7 @@ public partial class AboutViewModel : ObservableRecipient
     {
         Version version;
 
-        if (RuntimeHelper.IsMSIX)
+        if (RuntimeHelper.IsMsix)
         {
             var packageVersion = Package.Current.Id.Version;
 
@@ -42,7 +42,7 @@ public partial class AboutViewModel : ObservableRecipient
 
         var soundFile = Path.Join(installedPath, "Assets", "splort.wav");
 
-        SoundPlayer player = new System.Media.SoundPlayer(soundFile);
+        var player = new System.Media.SoundPlayer(soundFile);
         player.Play();
     }
 
@@ -52,7 +52,7 @@ public partial class AboutViewModel : ObservableRecipient
 
         var soundFile = Path.Join(installedPath, "Assets", "trolps.wav");
 
-        SoundPlayer player = new System.Media.SoundPlayer(soundFile);
+        var player = new System.Media.SoundPlayer(soundFile);
         player.Play();
     }
 }

@@ -50,10 +50,10 @@ class Program
     {
         var isRedirect = false;
 
-        AppActivationArguments args = AppInstance.GetCurrent().GetActivatedEventArgs();
-        ExtendedActivationKind kind = args.Kind;
+        var args = AppInstance.GetCurrent().GetActivatedEventArgs();
+        var kind = args.Kind;
 
-        AppInstance keyInstance = AppInstance.FindOrRegisterForKey("randomKey");
+        var keyInstance = AppInstance.FindOrRegisterForKey("randomKey");
 
         if (keyInstance.IsCurrent)
         {
@@ -71,7 +71,7 @@ class Program
     /// <summary>
     /// I'm not sure what this does tbh. Is it a stub?
     /// </summary>
-    private static void OnActivated(object sender, AppActivationArguments args)
+    private static void OnActivated(object? sender, AppActivationArguments args)
     {
         var kind = args.Kind;
     }

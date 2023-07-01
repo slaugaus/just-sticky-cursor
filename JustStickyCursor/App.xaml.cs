@@ -99,12 +99,16 @@ public partial class App : Application
     {
         base.OnLaunched(args);
 
-        App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
+        // Run CursorControl asynchronously
+        // TODO: better cancellation token than literally nothing
+        Task.Run(() => CursorControl.CursorControlLoop(CancellationToken.None));
+
+        // Test notification
+        //App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
 
         await App.GetService<IActivationService>().ActivateAsync(args);
 
-        //MainWindow.SetWindowSize(420, 69);
-
+        // Center window on screen and set size
         MainWindow.CenterOnScreen(700, 500);
     }
 }
