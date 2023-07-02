@@ -101,7 +101,7 @@ public partial class App : Application
 
         // Run CursorControl asynchronously
         // TODO: better cancellation token than literally nothing
-        Task.Run(() => CursorControl.CursorControlLoop(CancellationToken.None));
+        Task.Run(() => CursorControl.CursorControl.CursorControlLoop(CancellationToken.None));
 
         // Test notification
         //App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));

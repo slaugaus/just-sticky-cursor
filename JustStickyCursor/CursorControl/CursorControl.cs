@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Timers;
 using ABI.Microsoft.UI.Xaml;
 
-namespace JustStickyCursor;
+namespace JustStickyCursor.CursorControl;
 
 /// <summary>
 /// The actual important part of the program. <br/>
@@ -12,34 +12,6 @@ namespace JustStickyCursor;
 /// </summary>
 public class CursorControl
 {
-    // TODO delete this
-    private static void DebugPrint(string str)
-    {
-        System.Diagnostics.Debug.WriteLine(str);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class StickyBorder
-    {
-        public int Coordinate;  // The x/y (depends on isVertical) coordinate of the border
-        public bool IsVertical; // False = horizontal
-        // TODO: bool for direction
-        public int Buffer;      // "Holds" mouse movements towards the border
-        public int Stickiness;  // Max value the buffer should reach before letting the cursor through
-
-        public bool IsActive;
-
-        public StickyBorder(int coordinate, bool isVertical = false, int buffer = 0, int stickiness = 10)
-        {
-            Coordinate = coordinate;
-            IsVertical = isVertical;
-            Buffer = buffer;
-            Stickiness = stickiness;
-        }
-    }
-
     // TODO: idea is to load a List of StickyBorders and enforce each one
     private static List<StickyBorder> _stickyBorders = new();
 
@@ -50,7 +22,7 @@ public class CursorControl
     /// <see>See MSDN documentation for further information.</see>
     [DllImport("user32.dll")]
     private static extern bool GetCursorPos(out Point point);
-    
+
     /// <summary>
     /// Sets the cursor's position, in screen coordinates.
     /// </summary>
@@ -86,7 +58,7 @@ public class CursorControl
     /// The datatype returned by GetCursorPos, apparently
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    private readonly struct Point
+    public readonly struct Point
     {
         public readonly int X;
         public readonly int Y;
@@ -104,7 +76,7 @@ public class CursorControl
     /// MSDN docs said they were "LONG"s, but long is a different size in 64- and 32-bit! Using ints instead...
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    private readonly struct Rect
+    public readonly struct Rect
     {
         public readonly int left;
         public readonly int top;
@@ -131,10 +103,9 @@ public class CursorControl
     private static readonly Rect AustinMonitor1Rect = new(0, 0, 2560, 1080);
     private static readonly Rect AustinMonitor2Rect = new(337, -1080, 2256, 0);
 
-    // The sticky border on your PC is between y:0 and y:-1
-    private static StickyBorder _austinStickyBorder = new(0, stickiness:200);
-
-    // TODO helper function IsInRect
+    // The sticky border you want is between y:0 and y:-1... but here are some that can be shown on 1 screen
+    private static StickyBorder _demoBorderYBottom = new(540, true, stickiness: 500);
+    private static StickyBorder _demoBorderXLeft = new(960, false, isVertical: true, stickiness: 500);
 
     private static void Init()
     {
@@ -142,24 +113,71 @@ public class CursorControl
         System.Diagnostics.Debug.WriteLine("CursorControl totally loaded settings, for real");
 
         // TODO: Properly load list of StickyBorders
-        _stickyBorders.Add(_austinStickyBorder);
+        _stickyBorders.Add(_demoBorderYBottom);
+        _stickyBorders.Add(_demoBorderXLeft);
     }
-
-    private static void SetTimers() => throw new NotImplementedException();
 
     //public static MouseHook MouseHook = new();
     //public static KeyboardHook KeyboardHook = new();
 
-    private static void InstallHooks() => throw new NotImplementedException();
+    private static void EnforceBorder(StickyBorder border)
+    {
+        // Probably good for performance?
+        var x = _curPos.X;
+        var y = _curPos.Y;
+
+        // The cursor coordinate that matters
+        var cCoord = (border.IsVertical ? x : y);
+
+        var bCoord = border.Coordinate;
+        var stickiness = border.Stickiness;
+
+        // Border is active as long as buffer hasn't reached Stickiness
+        border.IsActive = border.Buffer < stickiness;
+        Helpers.DebugPrint(border.Buffer.ToString());
+
+        // If inactive and on the "right side", reset buffer (which will go active)
+        if (border.Buffer >= stickiness && Helpers.IsOnGoodSide(cCoord, border))
+        {
+            border.Buffer = 0;
+            return;
+        }
+
+        // TODO: account for direction in this mess
+        if (border.IsActive)
+        {
+            if (border.IsVertical)
+            {
+                if (x > bCoord)
+                {
+                    // Buffer however many pixels the cursor went over by
+                    border.Buffer += x - bCoord;
+                    //border.Buffer++;  // ignores cursor speed - not sure which one I like better
+                    SetCursorPos(bCoord, y);
+                }
+            }
+            else // horizontal
+            {
+                if (y < bCoord) // Crossed
+                {
+                    // Buffer however many pixels the cursor went over by
+                    border.Buffer += bCoord - y;
+                    //border.Buffer++;  // ignores cursor speed - not sure which one I like better
+                    SetCursorPos(x, bCoord);
+                }
+                // If cursor has moved away from the border, reset it
+                else if (y > bCoord)
+                {
+                    border.Buffer = 0;
+                }
+            }
+        }
+    }
 
     public static async Task CursorControlLoop(CancellationToken cancelToken)
     {
         // TODO: Initialization stuff goes here
         Init();
-
-        //SetTimers();
-
-        //InstallHooks();
 
         // Get original rect
         //GetClipCursor(out var origRect);
@@ -169,7 +187,7 @@ public class CursorControl
         //GetClipCursor(out var newRect);
         //System.Diagnostics.Debug.WriteLine($" new clipped Rect is {newRect.left}, {newRect.top}, {newRect.right}, {newRect.bottom}");
 
-        // TODO idea: System.Timers timer that re-clips the cursor every so often
+        // TODO idea: System.Timers timer that re-clips the cursor every so often?
 
         // As long as the UI hasn't requested us to stop...
         while (!cancelToken.IsCancellationRequested)
@@ -179,45 +197,12 @@ public class CursorControl
             GetCursorPos(out _curPos);
             // TODO: what rect is that in?
 
-            // TODO: SUPER INEFFICIENT HACK! UNVIABLE FOR RELEASE.
+            // TODO: SUPER INEFFICIENT HACK (if in the while loop)! UNVIABLE FOR RELEASE.
             //ClipCursor(AustinMonitor1Rect);
             //System.Diagnostics.Debug.WriteLine($"Clipped to austinMonitor1Rect.\nX: {_curPos.X}\nY: {_curPos.Y}\n");
 
             // Enforce each of the stickyBorders
-            //_stickyBorders.ForEach((border) =>
-            foreach (var border in _stickyBorders)
-            {
-                // Probably good for performance?
-                var x = _curPos.X;
-                var y = _curPos.Y;
-
-                // Border is active as long as buffer hasn't reached Stickiness
-                DebugPrint(border.Buffer.ToString());
-                border.IsActive = border.Buffer < border.Stickiness;
-
-                // TODO: Too tired to logic it out... If inactive, don't set activity until cursor is back
-                // (likely need to not rely only on buffer)
-
-                // If inactive and on the "right side", reset buffer and go active
-                if (!border.IsActive)
-                {
-                    border.Buffer = 0;
-                    //border.IsActive = true;
-                    continue;
-                }
-
-                if (border.IsVertical)
-                {
-                    // Cursor x something
-                }
-                else if (y < border.Coordinate) // Horizontal border
-                {
-                    // Cursor y something
-                    border.Buffer -= y;
-                    SetCursorPos(x, border.Coordinate);
-                }
-            }
-            //);
+            _stickyBorders.ForEach(EnforceBorder);
         }
     }
 }
